@@ -1,0 +1,46 @@
+#ReAct Reasosing and Acting Agent-#
+
+from typing import Annotated,Sequence,TypedDict
+ #Annoated & seq are type annotations
+
+from langchain_core.messages import BaseMessage
+#The foundational class for all messages types in the langgraph aka the parent class and all under it are childern like Humanmessage
+
+from langchain_core.messages import ToolMessage 
+#Passes data back to llm after it calls a tool such as content and the tool_call_id
+
+from langchain_core.messages import SystemMessage 
+#message for providing instrucntion to the llm
+
+from langgraph.graph.message import add_messages 
+This add_message is an reducer function it has rules to follow -
+1)Rule controls how updates from nodes are combined with existing state.
+2)It also tell us how to merge mew data into the current state 
+3)Without a reducer,updates would have replaced the exisiting value entirely
+
+# Without a reducer
+state = {"messages": ["Hi!"]}
+update = {"messages": ["Nice to meet you!"]}
+new_state = {"messages": ["Nice to meet you!"]}
+withour this every msg will be overwritten easily 
+
+# With a reducer
+state = {"messages": ["Hi!"]}
+update = {"messages": ["Nice to meet you!"]}
+new_state = {"messages": ["Hi!", "Nice to meet you!"]}
+But with it,it will appened it that is an key attribute so it just aggregates the data in the state and i that we have used add_messages this will allow us to append everything into an state without any overwritten
+
+from langgraph.graph import StateGraph,END
+from langgraph.prebuilt import ToolNode
+
+
+#Annoated-provides additional context without affecting the type itself
+#sequence-To automatically handles the state updates for sequences such as by adding new msg to chat history-aka it handles all the list operations
+ann=Annotated[str,"This has to be an valid email"] #ex we sent an abc@gamil.com it can go but if it has abc-@gmail.com it has to go through cause it is string but it need to be an valid one to stop those invalid one's 
+
+print(ann.__metadata__)
+ 
+
+ 
+class AgentState(TypedDict):
+    messages:Annotated[Sequence[BaseMessage],add_messages] # to preserve the state by appending it rather then just overwritten 
